@@ -28,7 +28,6 @@ public class PhoneBookActivity extends Activity {
     public static PhoneBookAdapter adapter;
     public static ArrayList<PhoneBook> phoneBookArrayList;
     public static PhoneBookOpenHelper pb;
-    private PhoneBookAdapter phoneBookAdapter;
 
 
     @Override
@@ -37,7 +36,7 @@ public class PhoneBookActivity extends Activity {
         setContentView(R.layout.activity_phonebook);
         lvPhoneBook = (LoadMoreListview) findViewById(R.id.lvPhonebook);
         phoneBookArrayList = new ArrayList<PhoneBook>();
-        phoneBookAdapter = new PhoneBookAdapter(this);
+        adapter = new PhoneBookAdapter(this);
         pb = new PhoneBookOpenHelper(this);
         Cursor cursor = pb.getInfomationContactList(pb);
         if (cursor.moveToFirst()) {
@@ -127,6 +126,32 @@ public class PhoneBookActivity extends Activity {
                 phoneBookArrayList.add(phoneBook);
                 adapterSize++;
             } while (cursor.moveToNext()&&adapterSize<dataSize);
+        }
+
+
+    }
+
+    public static void changeData() {
+        if (phoneBookArrayList != null) {
+            phoneBookArrayList.clear();
+
+            Cursor cursor = pb.getInfomationContactList(pb);
+            if (cursor.moveToFirst()) {
+                do {
+                    String name = cursor.getString(cursor.getColumnIndex(PhoneBookOpenHelper.FNAME));
+                    String phoneNumber1 = cursor.getString(cursor.getColumnIndex(PhoneBookOpenHelper.PNUMBER));
+                    String email = cursor.getString(cursor.getColumnIndex(PhoneBookOpenHelper.EMAIL));
+                    int tyoe = cursor.getInt(cursor.getColumnIndex(PhoneBookOpenHelper.TYPE));
+                    PhoneBook phoneBook = new PhoneBook();
+                    phoneBook.setName(name);
+                    phoneBook.setEmail(email);
+                    phoneBook.setPhoneNumber(phoneNumber1);
+                    phoneBook.setType(tyoe);
+                    phoneBookArrayList.add(phoneBook);
+                } while (cursor.moveToNext());
+            }
+
+
         }
 
 

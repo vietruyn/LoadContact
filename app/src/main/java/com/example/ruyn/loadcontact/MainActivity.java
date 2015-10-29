@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.ruyn.loadcontact.connect.ConnectWebservice;
 import com.example.ruyn.loadcontact.helper.PhoneBookOpenHelper;
@@ -90,13 +91,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }.start();
                 }
                 else{
-
+                    new getNewFriend().execute();
+                    Intent intent = new Intent(MainActivity.this, PhoneBookActivity.class);
+                    startActivity(intent);
                 }
 
 
         }
     }
 
+    /**
+     *
+     */
     class getListContact extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -155,5 +161,59 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             return null;
         }
+    }
+    /**
+     *
+     */
+    /**
+     * Check new friend use app
+     */
+    class getNewFriend extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            PhoneBookActivity.adapter.notifyDataSetChanged();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            pb = new PhoneBookOpenHelper(MainActivity.this);
+            cursor = pb.getInfomationContactList(pb);
+            if (cursor.moveToFirst()) {
+
+                do {
+                    String phoneNumber = cursor.getString(cursor.getColumnIndex(PhoneBookOpenHelper.PNUMBER));
+                    String email = cursor.getString(cursor.getColumnIndex(PhoneBookOpenHelper.EMAIL));
+                    int type1 = cursor.getInt(cursor.getColumnIndex(PhoneBookOpenHelper.TYPE));
+                    if (email == null) {
+                        String url1 = urlCC + "index.php?route=webservice/users/phonebook&username=" + mEmail + "&array_telephone=" + phoneNumber.replaceAll("\\D+", "");
+                        ConnectWebservice connectWebservice = new ConnectWebservice(url1);
+                        connectWebservice.fetchJSON();
+                        while (connectWebservice.parsingComplete) ;
+                        JSONObject jsonObject = null;
+                        try {
+                            jsonObject = new JSONObject(connectWebservice.getData());
+                            JSONObject number = jsonObject.getJSONObject(phoneNumber.replaceAll("\\D+", ""));
+                            type = Integer.parseInt(number.getString("check"));
+                            if (type != type1) {
+                                MainActivity.pb.updateFriend(email, type);
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        PhoneBookActivity.changeData();
+                    }
+                } while (cursor.moveToNext());
+            } else
+                Toast.makeText(MainActivity.this, "Data null", Toast.LENGTH_LONG).show();
+
+
+            return null;
+        }
+
+
     }
 }
