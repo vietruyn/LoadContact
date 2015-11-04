@@ -28,14 +28,14 @@
             android:id="@+id/imgSetting"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:src="@drawable/ic_setting"
+            android:src="@drawable/ic_logout"
             android:layout_alignParentRight="true"
             android:scaleType="centerInside"/>
         <ImageView
-            android:id="@+id/imgbuycoins"
+            android:id="@+id/imgGroup"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:src="@drawable/ic_add"
+            android:src="@drawable/ic_groupcontact"
             android:layout_toLeftOf="@+id/imgSetting"
             android:scaleType="centerInside"/>
 
@@ -43,7 +43,9 @@
     <fragment
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/fmListContact"/>
+        android:id="@+id/fmListContact"
+        android:name="com.example.ruyn.loadcontact.fragment.ContactFragment"
+        tools:layout="@layout/listcontact_fragment" />
 
 
 </LinearLayout>

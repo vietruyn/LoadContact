@@ -18,12 +18,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.ruyn.loadcontact.adapter.PhoneBookAdapter;
 import com.example.ruyn.loadcontact.connect.ConnectWebservice;
 import com.example.ruyn.loadcontact.helper.PhoneBookOpenHelper;
 import com.example.ruyn.loadcontact.model.PhoneBook;
+import com.example.ruyn.loadcontact.view.LoadMoreListview;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -51,6 +55,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EditText edtEmail;
     public static PhoneBookOpenHelper pb;
     String mEmail;
+    public static LoadMoreListview lvPhoneBook;
+    public static PhoneBookAdapter adapter;
+    public static ArrayList<PhoneBook> phoneBookArrayList;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.btnLoadData:
                 pb = new PhoneBookOpenHelper(MainActivity.this);
-                if(pb.getCountContact()==0){
+                if (pb.getCountContact() == 0) {
                     mProgressDialog = new ProgressDialog(MainActivity.this);
                     mProgressDialog.setMessage("aaaaaaaa");
                     mProgressDialog.show();
@@ -89,8 +97,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             startActivity(intent);
                         }
                     }.start();
-                }
-                else{
+                } else {
                     new getNewFriend().execute();
                     Intent intent = new Intent(MainActivity.this, PhoneBookActivity.class);
                     startActivity(intent);
@@ -173,7 +180,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            PhoneBookActivity.adapter.notifyDataSetChanged();
         }
 
         @Override
@@ -204,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        PhoneBookActivity.changeData();
+                        changeData();
                     }
                 } while (cursor.moveToNext());
             } else
@@ -212,6 +218,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
             return null;
+        }
+
+
+    }
+
+    public static void changeData() {
+        if (phoneBookArrayList != null) {
+            phoneBookArrayList.clear();
+
+            Cursor cursor = pb.getInfomationContactList(pb);
+            if (cursor.moveToFirst()) {
+                do {
+                    String name = cursor.getString(cursor.getColumnIndex(PhoneBookOpenHelper.FNAME));
+                    String phoneNumber1 = cursor.getString(cursor.getColumnIndex(PhoneBookOpenHelper.PNUMBER));
+                    String email = cursor.getString(cursor.getColumnIndex(PhoneBookOpenHelper.EMAIL));
+                    int tyoe = cursor.getInt(cursor.getColumnIndex(PhoneBookOpenHelper.TYPE));
+                    PhoneBook phoneBook = new PhoneBook();
+                    phoneBook.setName(name);
+                    phoneBook.setEmail(email);
+                    phoneBook.setPhoneNumber(phoneNumber1);
+                    phoneBook.setType(tyoe);
+                    phoneBookArrayList.add(phoneBook);
+                } while (cursor.moveToNext());
+            }
+
+
         }
 
 
